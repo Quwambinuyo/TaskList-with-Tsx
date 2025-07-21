@@ -32,6 +32,20 @@ const App = () => {
     toast.success("Task added!");
   };
 
+  const toggleTaskCompletion = (index: number) => {
+    const updatedTasks = tasks.map((task, i) =>
+      i === index ? { ...task, isCompleted: !task.isCompleted } : task
+    );
+    setTasks(updatedTasks);
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  };
+
+  const deleteTask = (index: number) => {
+    const updatedTasks = tasks.filter((_, i) => i !== index);
+    setTasks(updatedTasks);
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  };
+
   useEffect(() => {
     const storedTasks = localStorage.getItem("tasks");
     if (storedTasks) {
@@ -77,13 +91,23 @@ const App = () => {
               key={index}
               className="bg-gray-100 p-2 rounded-md shadow-sm flex items-center justify-between"
             >
-              <span className="text-gray-800">{task.description}</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={task.isCompleted}
+                  onChange={() => toggleTaskCompletion(index)}
+                  className="accent-rose-600"
+                />
+                <span
+                  className={`text-gray-800 ${
+                    task.isCompleted ? "line-through text-gray-500" : ""
+                  }`}
+                >
+                  {task.description}
+                </span>
+              </div>
               <button
-                onClick={() => {
-                  const updatedTasks = tasks.filter((_, i) => i !== index);
-                  setTasks(updatedTasks);
-                  localStorage.setItem("tasks", JSON.stringify(updatedTasks));
-                }}
+                onClick={() => deleteTask(index)}
                 className="text-red-500 hover:text-red-700 transition-colors duration-200"
                 title="Delete Task"
               >
