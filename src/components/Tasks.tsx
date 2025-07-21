@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FaTrash } from "react-icons/fa";
 
 type Task = {
   description: string;
@@ -24,10 +25,19 @@ const App = () => {
       isCompleted: false,
     };
 
-    setTasks([...tasks, newTask]);
-    setTaskDescription(""); // Clear input
+    const updatedTasks = [...tasks, newTask];
+    setTasks(updatedTasks);
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+    setTaskDescription("");
     toast.success("Task added!");
   };
+
+  useEffect(() => {
+    const storedTasks = localStorage.getItem("tasks");
+    if (storedTasks) {
+      setTasks(JSON.parse(storedTasks));
+    }
+  }, []);
 
   return (
     <div className="max-w-2xl mx-auto mt-6 px-4 flex flex-col">
@@ -63,8 +73,22 @@ const App = () => {
       <div className="mt-6">
         <ul className="space-y-2 list">
           {tasks.map((task, index) => (
-            <li key={index} className="bg-gray-100 p-2 rounded-md shadow-sm">
-              {task.description}
+            <li
+              key={index}
+              className="bg-gray-100 p-2 rounded-md shadow-sm flex items-center justify-between"
+            >
+              <span className="text-gray-800">{task.description}</span>
+              <button
+                onClick={() => {
+                  const updatedTasks = tasks.filter((_, i) => i !== index);
+                  setTasks(updatedTasks);
+                  localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+                }}
+                className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                title="Delete Task"
+              >
+                <FaTrash size={18} />
+              </button>
             </li>
           ))}
         </ul>
